@@ -16,6 +16,91 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    // Initialization
+    NSCalendar* calendar        = [NSCalendar currentCalendar];
+    NSDate* today               = [NSDate date];
+    NSUInteger thisYear         = [[calendar components:NSCalendarUnitYear fromDate:today] year];
+    NSDateFormatter*    dateFormatter   = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"dd.MM.yyyy EEEE"];
+    
+    // 13. Weekday for every first day and every month in current year
+    NSLog(@"--------------------------------------------------------");
+    NSLog(@"Weekday for every first day and every month in current year");
+    NSLog(@"--------------------------------------------------------");
+    NSDateComponents* comp      = [calendar
+                               components:NSCalendarUnitYear
+                               fromDate:today];
+    comp.day                = 1;
+
+    for (int i = 1; i <= 12; i++) {
+        
+        comp.month              = i;
+        NSDate* firstDayOfMonth = [calendar dateFromComponents:comp];
+        
+        NSUInteger weekDay      = [[calendar components:NSCalendarUnitWeekday fromDate:firstDayOfMonth] weekday];
+        NSLog(@"date = %@ weekday = %d", [dateFormatter stringFromDate:firstDayOfMonth], weekDay);
+    }
+    
+    // 14. Date for every sunday in this year
+    NSLog(@"--------------------------------------------------------");
+    NSLog(@"Date for every sunday in this year");
+    NSLog(@"--------------------------------------------------------");
+    NSDateComponents* comp02    = [[NSDateComponents alloc] init];
+    [comp02 setYear:thisYear];
+    [comp02 setMonth:1];
+    [comp02 setWeekday:1];
+    [comp02 setWeekdayOrdinal:1];
+    
+    NSDate* enumDay             = [calendar dateFromComponents:comp02];
+    
+    while ([[calendar components:NSCalendarUnitYear fromDate:enumDay] year] == thisYear) {
+        
+        NSLog(@"%@", [dateFormatter stringFromDate:enumDay]);
+        
+        comp02.weekdayOrdinal++;
+        
+        enumDay                 = [calendar dateFromComponents:comp02];
+    }
+    
+    // 15. Working day count for every month in this year
+    NSLog(@"--------------------------------------------------------");
+    NSLog(@"Working day count for every month in this year");
+    NSLog(@"--------------------------------------------------------");
+    NSDateComponents* comp03    = [calendar
+                                   components:NSCalendarUnitYear
+                                   fromDate:today];
+    NSUInteger weekDay;
+    NSUInteger workingDay;
+    [dateFormatter setDateFormat:@"MMMM"];
+    
+    
+    for (int month = 1; month <= 12; month++) {
+        
+        comp03.month            = month;
+        comp03.day              = 1;
+        NSDate* enumDay02       = [calendar dateFromComponents:comp03];
+        weekDay      = 0;
+        workingDay   = 0;
+        NSString* stringMonth   = [dateFormatter stringFromDate:enumDay02];
+        
+        while ([[calendar components:NSCalendarUnitMonth fromDate:enumDay02] month] == month) {
+            
+            weekDay = [[calendar components:NSCalendarUnitWeekday fromDate:enumDay02] weekday];
+            
+            if (!((weekDay == 1) | (weekDay == 7))) {
+                workingDay++;
+            }
+            
+            comp03.day++;
+            enumDay02           = [calendar dateFromComponents:comp03];
+            
+        }
+        
+        NSLog(@"Working days in %@: %d", stringMonth, workingDay);
+        
+    }
+    
     return YES;
 }
 
